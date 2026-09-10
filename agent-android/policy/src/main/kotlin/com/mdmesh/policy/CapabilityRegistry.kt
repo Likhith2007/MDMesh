@@ -1,11 +1,23 @@
 package com.mdmesh.policy
 
+import com.mdmesh.policy.app.AppBlockPolicy
+import com.mdmesh.policy.app.AppBlockPolicyFactory
+import com.mdmesh.policy.app.AppHidePolicy
+import com.mdmesh.policy.app.AppHidePolicyFactory
 import com.mdmesh.policy.bluetooth.BluetoothPolicy
 import com.mdmesh.policy.bluetooth.BluetoothPolicyFactory
 import com.mdmesh.policy.camera.CameraPolicy
 import com.mdmesh.policy.camera.CameraPolicyFactory
 import com.mdmesh.policy.screenshots.ScreenshotsPolicy
 import com.mdmesh.policy.screenshots.ScreenshotsPolicyFactory
+import com.mdmesh.policy.security.AdminRemovalPolicy
+import com.mdmesh.policy.security.AdminRemovalPolicyFactory
+import com.mdmesh.policy.security.FactoryResetPolicy
+import com.mdmesh.policy.security.FactoryResetPolicyFactory
+import com.mdmesh.policy.security.UnknownSourcesPolicy
+import com.mdmesh.policy.security.UnknownSourcesPolicyFactory
+import com.mdmesh.policy.security.UsbDebugPolicy
+import com.mdmesh.policy.security.UsbDebugPolicyFactory
 import com.mdmesh.policy.usb.UsbStoragePolicy
 import com.mdmesh.policy.usb.UsbStoragePolicyFactory
 import com.mdmesh.policy.wifi.DpmHandle
@@ -42,6 +54,11 @@ class CapabilityRegistry(
         ScreenshotsPolicyFactory.create(handle)?.let { put(ScreenshotsPolicy.CAPABILITY_KEY, it) }
         BluetoothPolicyFactory.create(handle)?.let { put(BluetoothPolicy.CAPABILITY_KEY, it) }
         UsbStoragePolicyFactory.create(handle)?.let { put(UsbStoragePolicy.CAPABILITY_KEY, it) }
+        // Security policies
+        UsbDebugPolicyFactory.create(handle)?.let { put(UsbDebugPolicy.CAPABILITY_KEY, it) }
+        FactoryResetPolicyFactory.create(handle)?.let { put(FactoryResetPolicy.CAPABILITY_KEY, it) }
+        UnknownSourcesPolicyFactory.create(handle)?.let { put(UnknownSourcesPolicy.CAPABILITY_KEY, it) }
+        AdminRemovalPolicyFactory.create(handle)?.let { put(AdminRemovalPolicy.CAPABILITY_KEY, it) }
         // Each factory probe returns null on an unsupported device, so a key only
         // appears here when a usable strategy exists.
         // Absence == "not advertised" == "never commanded".
@@ -52,7 +69,20 @@ class CapabilityRegistry(
      * registered strategies, so it can never drift from what can actually be applied.
      * Each entry corresponds to a row in `proto/registry.md` § policy.
      */
-    fun supportedPolicyKeys(): List<String> = togglePolicies().keys.toList()
+    fun supportedPolicyKeys(): List<String> = (togglePolicies().keys + complexPolicies().keys).toList()
+
+    /**
+     * The complex policies with a working strategy on this device, keyed by capability key.
+     * These are policies with context-aware payloads (e.g., app package name, time schedules).
+     * Add a probe here to register a new complex policy.
+     */
+    fun complexPolicies(): Map<String, ComplexPolicy> = buildMap {
+        AppBlockPolicyFactory.create(handle)?.let { put(AppBlockPolicy.CAPABILITY_KEY, it) }
+        AppHidePolicyFactory.create(handle)?.let { put(AppHidePolicy.CAPABILITY_KEY, it) }
+        // Each factory probe returns null on an unsupported device, so a key only
+        // appears here when a usable strategy exists.
+        // Absence == "not advertised" == "never commanded".
+    }
 
     /** Convenience: resolve the live [DeviceControl] facade for this device. */
     fun deviceControl(): DeviceControl? {

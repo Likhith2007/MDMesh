@@ -19,6 +19,13 @@ with the agent's capability advertisement and the server's command catalog.
 | `passwordComplexity` | password policy | 31 | setRequiredPasswordComplexity (setPasswordQuality deprecated @26) |
 | `systemUpdatePolicy` | OS update windows | 24 | |
 | `factoryResetProtection` | FRP policy | 30 | setFactoryResetProtectionPolicy |
+| `usbDebug` | disable USB debugging | 18 | DISALLOW_DEBUGGING_FEATURES |
+| `factoryReset` | prevent factory reset | 18 | DISALLOW_FACTORY_RESET |
+| `unknownSources` | block unknown app sources | 28 | DISALLOW_INSTALL_UNKNOWN_SOURCES |
+| `appBlock` | block app launch (per package) | 24 | setApplicationHidden (complex payload) |
+| `appHide` | hide app icon (per package) | 24 | setApplicationHidden (complex payload) |
+| `adminRemoval` | detect admin removal | 24 | telemetry-based, isAdminActive check |
+| `internetSchedule` | time-based internet access | 24 | WorkManager scheduling |
 
 ### appManagement
 | key | meaning | notes |

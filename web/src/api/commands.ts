@@ -61,6 +61,38 @@ export const COMMAND_TEMPLATES: CommandTemplate[] = [
     },
   },
   {
+    key: 'usb-debug-off',
+    label: 'Disable USB Debugging',
+    description: 'Apply a policy that blocks USB debugging on the device.',
+    danger: true,
+    request: {
+      type: 'policy.apply',
+      requiresCapability: 'policy.usbDebug',
+      payload: JSON.stringify({ policy: 'usbDebug', value: false }),
+    },
+  },
+  {
+    key: 'factory-reset-off',
+    label: 'Prevent Factory Reset',
+    description: 'Apply a policy that prevents users from performing a factory reset.',
+    danger: true,
+    request: {
+      type: 'policy.apply',
+      requiresCapability: 'policy.factoryReset',
+      payload: JSON.stringify({ policy: 'factoryReset', value: false }),
+    },
+  },
+  {
+    key: 'unknown-sources-off',
+    label: 'Block Unknown Sources',
+    description: 'Apply a policy that blocks installation from unknown app sources.',
+    request: {
+      type: 'policy.apply',
+      requiresCapability: 'policy.unknownSources',
+      payload: JSON.stringify({ policy: 'unknownSources', value: false }),
+    },
+  },
+  {
     key: 'reboot',
     label: 'Reboot device',
     description: 'Restart the device now.',

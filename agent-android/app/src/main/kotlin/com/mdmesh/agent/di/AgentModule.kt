@@ -16,6 +16,7 @@ import com.mdmesh.core.command.handlers.AppIconsHandler
 import com.mdmesh.core.command.handlers.AppInstallHandler
 import com.mdmesh.core.command.handlers.AppScanHandler
 import com.mdmesh.core.command.handlers.AppUninstallHandler
+import com.mdmesh.core.command.handlers.ComplexPolicyHandler
 import com.mdmesh.core.command.handlers.ConfigSyncHandler
 import com.mdmesh.core.command.handlers.DeviceAlertHandler
 import com.mdmesh.core.command.handlers.DeviceLockHandler
@@ -59,6 +60,7 @@ import com.mdmesh.oem.GenericOemAdapter
 import com.mdmesh.oem.KnoxAdapter
 import com.mdmesh.oem.OemAdapter
 import com.mdmesh.policy.CapabilityRegistry
+import com.mdmesh.policy.ComplexPolicy
 import com.mdmesh.policy.TogglePolicy
 import com.mdmesh.policy.wifi.DpmHandle
 import com.mdmesh.remote.RemoteControlTierDetector
@@ -172,6 +174,11 @@ object AgentModule {
     fun providePolicyToggles(registry: CapabilityRegistry): Map<String, TogglePolicy> =
         registry.togglePolicies()
 
+    /** The supported complex policies, keyed by capability key (data-driven routing). */
+    @Provides
+    fun providePolicyComplex(registry: CapabilityRegistry): Map<String, ComplexPolicy> =
+        registry.complexPolicies()
+
     // --- Command handlers (multibound). Add a command == add one @IntoSet provider. ---
 
     @Provides
@@ -183,6 +190,12 @@ object AgentModule {
     fun providePolicyApplyHandler(
         toggles: Map<String, @JvmSuppressWildcards TogglePolicy>,
     ): CommandHandler = PolicyApplyHandler(toggles)
+
+    @Provides
+    @IntoSet
+    fun provideComplexPolicyHandler(
+        complexPolicies: Map<String, @JvmSuppressWildcards ComplexPolicy>,
+    ): CommandHandler = ComplexPolicyHandler(complexPolicies)
 
     @Provides
     @Singleton
